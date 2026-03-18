@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System;
-
+using Unity.VisualScripting;
+using System.Security.Cryptography;
 
 public class UserVehicle : MonoBehaviour
 {
@@ -27,16 +28,16 @@ public class UserVehicle : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rotateSpeed = 90;
         maxSpeed = 40;
-        minSpeed = -20;
+        minSpeed = -40;
         frictionConstant = 5;
+        rb.mass = 1;
     }
 
     // Update is called once per frame
     void Update()
     {
-        print(speed);
 
-        if(transform.position.y<5){
+        if(transform.position.y<1){
         // Pressing W and Accelerating
         if(movementY > 0 && speed < maxSpeed)
         {
@@ -79,14 +80,14 @@ public class UserVehicle : MonoBehaviour
         if(movementX < 0)
         {
             transform.Rotate(0,rotateSpeed*-1*Time.deltaTime,0);
-            speed=Math.Abs(speed-rotateSpeed*0.2f*Time.deltaTime);
+            speed=speed-rotateSpeed*0.2f*Time.deltaTime;
         }
 
         //If player is pressing D, rotate right
         if(movementX > 0)
         {
             transform.Rotate(0,rotateSpeed*1*Time.deltaTime,0);
-            speed=Math.Abs(speed-rotateSpeed*0.2f*Time.deltaTime);
+            speed=speed-rotateSpeed*0.2f*Time.deltaTime;
         }
 
         }
@@ -97,8 +98,8 @@ public class UserVehicle : MonoBehaviour
     void FixedUpdate()
     {
         Vector3 movement = (transform.forward) * speed * Time.fixedDeltaTime;
-        print(movement);
         rb.MovePosition(rb.position + movement);
+
     }
 
     void OnMove(InputValue inputV)
@@ -109,6 +110,21 @@ public class UserVehicle : MonoBehaviour
             movementX = move2d.x;
             movementY = move2d.y;
         
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("PushBack"))
+        {
+        ContactPoint contact = collision.contacts[0];
+        Vector3 normal = contact.normal;
+
+        // Reflect the current velocity off the surface
+        Vector3 reflectedVelocity = Vector3.Reflect(rb.linearVelocity, normal);
+
+        // Set velocity directly for a clean bounce
+        rb.linearVelocity = reflectedVelocity;
+        }
     }
 }
 
