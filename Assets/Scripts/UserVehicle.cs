@@ -11,6 +11,7 @@ public class UserVehicle : MonoBehaviour
      private float movementX;
      private float movementY;
      
+     private float newXValue;
      private Vector2 move2d;
 
      private float speed;
@@ -27,7 +28,7 @@ public class UserVehicle : MonoBehaviour
         speed = 0;
         rb = GetComponent<Rigidbody>();
         rotateSpeed = 90;
-        maxSpeed = 40;
+        maxSpeed = 70;
         minSpeed = -40;
         frictionConstant = 5;
         rb.mass = 1;
@@ -37,17 +38,17 @@ public class UserVehicle : MonoBehaviour
     void Update()
     {
 
-        if(transform.position.y<1){
         // Pressing W and Accelerating
         if(movementY > 0 && speed < maxSpeed)
         {
             speed +=15*Time.deltaTime;
+            Debug.Log("RUNN");
         }
 
         // Pressing S and Decelerating
         if(movementY < 0 && speed > minSpeed)
         {
-            speed -=10*Time.deltaTime;
+            speed -=30*Time.deltaTime;
         }
 
         //Make sure speed is not lower than minimum speed
@@ -89,8 +90,6 @@ public class UserVehicle : MonoBehaviour
             transform.Rotate(0,rotateSpeed*1*Time.deltaTime,0);
             speed=speed-rotateSpeed*0.2f*Time.deltaTime;
         }
-
-        }
         
 
     }
@@ -100,7 +99,14 @@ public class UserVehicle : MonoBehaviour
         Vector3 movement = (transform.forward) * speed * Time.fixedDeltaTime;
         rb.MovePosition(rb.position + movement);
 
-    }
+        gameObject.transform.position = new Vector3(gameObject.transform.position.x, 1, gameObject.transform.position.z);
+        Vector3 currentEulerAngles = transform.eulerAngles;
+        // Modify the desired axes
+        currentEulerAngles.x = newXValue; // Set X to a specific value
+        currentEulerAngles.z = 0f;         // Set Z to 0
+        // Reassign the whole vector back
+        transform.eulerAngles = currentEulerAngles;        
+        }
 
     void OnMove(InputValue inputV)
     {
@@ -112,20 +118,7 @@ public class UserVehicle : MonoBehaviour
         
     }
 
-    void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("PushBack"))
-        {
-        ContactPoint contact = collision.contacts[0];
-        Vector3 normal = contact.normal;
-
-        // Reflect the current velocity off the surface
-        Vector3 reflectedVelocity = Vector3.Reflect(rb.linearVelocity, normal);
-
-        // Set velocity directly for a clean bounce
-        rb.linearVelocity = reflectedVelocity;
-        }
-    }
+    
 }
 
 
