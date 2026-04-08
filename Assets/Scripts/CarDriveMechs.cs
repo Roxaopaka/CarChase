@@ -4,27 +4,37 @@ using UnityEngine.AI;
 using UnityEngine.SocialPlatforms.Impl;
 public class CarDriveMechs : MonoBehaviour
 {
+    private Rigidbody rb;
+
     public GameObject playerLocation;  //Create a public reference so that the AI can follow the player's location
     private NavMeshAgent navMeshAgent;   //Create a public reference so that the component, "navMeshAgent" can be used in the code
-    private int speeds = 10;  //Set the initial speed of the AI to 4
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private int hit = 0;
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>(); //Reference
+        playerLocation = GameObject.FindWithTag("CAR");
         
-        navMeshAgent.speed = speeds; //Set the initial speed of the AI to speeds (which is 4)
+        rb = GetComponent<Rigidbody>();
+        // Prevent Rigidbody from fighting the NavMeshAgent
+        rb.isKinematic = true;
     }
 
     // Update is called once per frame
     void Update()
     {
-        gameObject.transform.position = new Vector3(gameObject.transform.position.x, 0.5f, gameObject.transform.position.z);
+            gameObject.transform.position = new Vector3(gameObject.transform.position.x, 0.5f, gameObject.transform.position.z);
 
-        if (hit != 1)
-        {
-            navMeshAgent.SetDestination(playerLocation.transform.position);
-        }
+            navMeshAgent.angularSpeed = 150-navMeshAgent.speed;
+            if (hit != 1)
+            {
+                print("hello?");
+                 navMeshAgent.SetDestination(playerLocation.transform.position);
+            }else{
+                navMeshAgent.ResetPath();        
+    }   
+        
+        
     }
 
     void OnCollisionEnter(Collision collision)
@@ -33,7 +43,12 @@ public class CarDriveMechs : MonoBehaviour
         {
             hit = 1;
         }
-    }
+        if (collision.gameObject.CompareTag("Props"))
+        {
+            navMeshAgent.velocity = navMeshAgent.velocity*0.3f;
+        }
+}
+
 }
 
 
