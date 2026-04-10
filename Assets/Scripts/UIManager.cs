@@ -20,7 +20,12 @@ public class UIManager : MonoBehaviour
     {
         if (script.getNumCars()-currentStar == 1)
         {
-            
+            addStars();
         }
+    }
+
+    private void addStars()
+    {
+        
     }
 }
