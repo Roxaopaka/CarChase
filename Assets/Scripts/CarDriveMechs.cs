@@ -9,7 +9,9 @@ public class CarDriveMechs : MonoBehaviour
     public GameObject playerLocation;  //Create a public reference so that the AI can follow the player's location
     private NavMeshAgent navMeshAgent;   //Create a public reference so that the component, "navMeshAgent" can be used in the code
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    private int hit = 0;
+    private float hitTimer = 0;
+    private bool hit = false;
+    private float maxSpeed = 40;
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>(); //Reference
@@ -25,13 +27,13 @@ public class CarDriveMechs : MonoBehaviour
     {
             gameObject.transform.position = new Vector3(gameObject.transform.position.x, 0.5f, gameObject.transform.position.z);
 
-            navMeshAgent.angularSpeed = 150-navMeshAgent.speed;
-            if (hit != 1)
+            navMeshAgent.angularSpeed = 200-navMeshAgent.velocity.magnitude;
+            if (hit != true)
             {
-                print("hello?");
-                 navMeshAgent.SetDestination(playerLocation.transform.position);
+                navMeshAgent.SetDestination(playerLocation.transform.position);
+                
             }else{
-                navMeshAgent.ResetPath();        
+                navMeshAgent.ResetPath();
     }   
         
         
@@ -39,15 +41,37 @@ public class CarDriveMechs : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
+        if (collision.gameObject.CompareTag("Props"))
+        {
+            navMeshAgent.speed = maxSpeed*0.5f;
+        }
+}
+
+    void OnCollisionStay(Collision collision)
+    {
         if (collision.gameObject.CompareTag("CAR"))
         {
-            hit = 1;
+            hitTimer+=1*Time.deltaTime;
+            if (hitTimer >= 4)
+            {
+                hit = true;
+            }
+        }
+    }
+    void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("CAR"))
+        {
+            hitTimer = 0f;
         }
         if (collision.gameObject.CompareTag("Props"))
         {
-            navMeshAgent.velocity = navMeshAgent.velocity*0.3f;
+            navMeshAgent.speed = maxSpeed;
         }
-}
+    }
+    
+        
+    
 
 }
 

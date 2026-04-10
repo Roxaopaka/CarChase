@@ -1,8 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System;
-using System.Threading;
-using System.Runtime.CompilerServices;
 
 public class UserVehicle : MonoBehaviour
 {
@@ -110,7 +108,16 @@ public class UserVehicle : MonoBehaviour
             speed=speed-rotateSpeed*0.2f*Time.deltaTime;
         }
 
-        
+        if (wantedLevel > 0)
+        {
+            count+=Time.deltaTime;
+            if (count > 10)
+            {
+                wantedLevel++;
+                Debug.Log(wantedLevel);
+                count-=10;
+            }
+        }
 
     }
 
@@ -125,15 +132,6 @@ public class UserVehicle : MonoBehaviour
     Vector3 movement = transform.forward * speed * Time.fixedDeltaTime;
     rb.MovePosition(rb.position + movement);
 
-        if (wantedLevel > 0)
-        {
-            count+=Time.deltaTime;
-            if (count > 60)
-            {
-                wantedLevel++;
-            }
-        }
-    
     }
     
 
@@ -166,7 +164,7 @@ public class UserVehicle : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("PushBack"))
         {
-            speed = speed*0.2f;
+            speed = speed*-0.2f;
         }
     }
     

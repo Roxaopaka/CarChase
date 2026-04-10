@@ -12,6 +12,8 @@ public class Spawner : MonoBehaviour
 
     private int currentWantedLevel;
 
+    private int numCars;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -27,11 +29,13 @@ public class Spawner : MonoBehaviour
         Debug.Log(script.getWantedLevel());
         if (currentWantedLevel - script.getWantedLevel() <0)
         {
-            spawnPosition = new Vector3(0,0,0);
-
-            GameObject cops = Instantiate(copPreFab,spawnPosition,rotation);
-            Debug.Log("SPAWNED");
+            GameObject cops = Instantiate(copPreFab,this.transform);
+            numCars++;
         }
         currentWantedLevel = script.getWantedLevel();
 }
+    public int getNumCars()
+    {
+        return numCars;
+    }
 }
