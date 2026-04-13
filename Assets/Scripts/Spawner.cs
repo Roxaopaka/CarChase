@@ -1,39 +1,38 @@
 using UnityEngine;
 
-public class Spawner : MonoBehaviour
+public class Spawner : MonoBehaviour //This is the script for the spawner of cop car objects
 {
 
-    public GameObject copPreFab;
-    private UserVehicle script;
-    public GameObject userCar;
+    public GameObject copPreFab; //Reference for the cop car prefab
+    private UserVehicle script; //We need the user vehicles script to know the current wanted level 
+    public GameObject userCar; //Reference for the user's car
 
-    private Vector3 spawnPosition; 
-    private Quaternion rotation;
+    private int currentWantedLevel; //Store the current wanted level
 
-    private int currentWantedLevel;
-
-    private int numCars;
+    private int numCars; //Store the number of police cars
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         script = userCar.GetComponent<UserVehicle>();
-        rotation = Quaternion.Euler(0f, 0f, 0f);
-
     }
 
-    // Update is called once per frame
+    //Fixed update does not run every frame. Instead, it runs every 0.02 seconds
     void FixedUpdate()
     {
         Debug.Log(script.getWantedLevel());
+        
+        //This if statement is to check if the user's wanted level went up
         if (currentWantedLevel - script.getWantedLevel() <0)
         {
-            GameObject cops = Instantiate(copPreFab,this.transform);
+            //Instantiate the prefab
+            Instantiate(copPreFab,this.transform);
             numCars++;
         }
         currentWantedLevel = script.getWantedLevel();
 }
+    //Getter method to return the number of police cars on the map
     public int getNumCars()
     {
         return numCars;

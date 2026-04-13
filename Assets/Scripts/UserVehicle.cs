@@ -13,7 +13,6 @@ public class UserVehicle : MonoBehaviour
      private float movementX;
      private float movementY;
      
-     private float newXValue;
      private Vector2 move2d;
 
      private float speed;
@@ -47,7 +46,8 @@ public class UserVehicle : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (speed > 30)
+        //If the user car breaks the speed limit, set the wanted level to 1
+        if (speed > 30 && wantedLevel==0)
         {
             wantedLevel=1;
         }
@@ -57,12 +57,12 @@ public class UserVehicle : MonoBehaviour
             speed +=15*Time.deltaTime;
         }
 
-        // Pressing S and Decelerating
+        // Pressing S and Decelerating <-- THIS IS BRAKING
         if(movementY < 0 && speed > 0)
         {
             speed -=30*Time.deltaTime;
         }
-
+        // Pressing S and Decelerating <-- THIS IS REVERSE
         if(movementY<0 && speed>minSpeed && speed < 0)
         {
             speed-=10*Time.deltaTime;
@@ -124,7 +124,7 @@ public class UserVehicle : MonoBehaviour
     void FixedUpdate(){
     
     
-    //*THE FOLLOWING 3 LINES WERE ASSISTED BY AI (CLAUDE)
+    //*THE FOLLOWING 4 LINES WERE ASSISTED BY AI (CLAUDE)
         // Prevent collision impulses from persisting — we handle movement manually
     rb.linearVelocity = Vector3.zero;
     rb.angularVelocity = Vector3.zero;
@@ -135,15 +135,6 @@ public class UserVehicle : MonoBehaviour
     }
     
 
-    void OnMove(InputValue inputV)
-    {
-        move2d = inputV.Get<Vector2>();
-
-        
-            movementX = move2d.x;
-            movementY = move2d.y;
-        
-    }
 
     public int getIteration()
     {
@@ -152,13 +143,22 @@ public class UserVehicle : MonoBehaviour
 
     public void OnTestKey()
     {
-        iteration++;
+        if (iteration == 0)
+        {
+            iteration=1;
+        }
+        else
+        {
+            iteration=0;
+        }
     }
 
     public int getWantedLevel()
     {
         return wantedLevel;
     }
+
+    //If the user hits a building, get pushed back by reversing the speed
 
     void OnCollisionEnter(Collision collision)
     {

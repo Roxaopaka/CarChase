@@ -1,20 +1,20 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.SocialPlatforms.Impl;
-public class CarDriveMechs : MonoBehaviour
+public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop Car Pre Fab
 {
     private Rigidbody rb;
 
     public GameObject playerLocation;  //Create a public reference so that the AI can follow the player's location
     private NavMeshAgent navMeshAgent;   //Create a public reference so that the component, "navMeshAgent" can be used in the code
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    private float hitTimer = 0;
-    private bool hit = false;
+    private float hitTimer = 0; //This timer is to check if the cop car is in contact with the user's car for 4 seconds. If hitTimer = 4, game over
+    private bool hit = false; //If the cop car catches the user, this becomes true
     private float maxSpeed = 40;
     void Start()
     {
-        navMeshAgent = GetComponent<NavMeshAgent>(); //Reference
+        navMeshAgent = GetComponent<NavMeshAgent>(); 
+
+        //GET THE USER's LOCATION
         playerLocation = GameObject.FindWithTag("CAR");
         
         rb = GetComponent<Rigidbody>();
@@ -25,11 +25,14 @@ public class CarDriveMechs : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //Keep the car at a constant height (0.5f)
             gameObject.transform.position = new Vector3(gameObject.transform.position.x, 0.5f, gameObject.transform.position.z);
 
+        //The angular speed decreases as linear speed increases, which simulates real world physics
             navMeshAgent.angularSpeed = 200-navMeshAgent.velocity.magnitude;
+            //If the user is still not caught
             if (hit != true)
-            {
+            {   //Set the destination of the navMeshAgent to the user's location
                 navMeshAgent.SetDestination(playerLocation.transform.position);
                 
             }else{
@@ -39,31 +42,49 @@ public class CarDriveMechs : MonoBehaviour
         
     }
 
+
+    //This function makes sure that the cop car doesn't just ram through the props without losing speed (ie. lamps, benches)
     void OnCollisionEnter(Collision collision)
     {
+        //If the cop car hits a prop, set the max speed to 50% UNTIL the cop car escapes the prop
         if (collision.gameObject.CompareTag("Props"))
         {
             navMeshAgent.speed = maxSpeed*0.5f;
         }
+
+        if (collision.gameObject.CompareTag("PushBack"))
+        {
+            navMeshAgent.speed = navMeshAgent.speed*-0.2f;
+        }
 }
 
+
+    //This function counts how many seconds the cop car is in consecutive contact with the user car
     void OnCollisionStay(Collision collision)
     {
+        //If the cop car hits the user car
         if (collision.gameObject.CompareTag("CAR"))
         {
+            //Start counting up
             hitTimer+=1*Time.deltaTime;
+            //If it gets to 4 seconds
             if (hitTimer >= 4)
             {
+                //The cop car has arrested the user car 
                 hit = true;
             }
         }
     }
+
+    //This function is called when the cop car stops colliding with another object
     void OnCollisionExit(Collision collision)
     {
+        //If the cop car stops hitting the user car, reset the timer
         if (collision.gameObject.CompareTag("CAR"))
         {
             hitTimer = 0f;
         }
+        //If the cop car stops hitting the prop car, restore the max speed
         if (collision.gameObject.CompareTag("Props"))
         {
             navMeshAgent.speed = maxSpeed;
@@ -74,48 +95,3 @@ public class CarDriveMechs : MonoBehaviour
     
 
 }
-
-
-/*using UnityEngine;
-using UnityEngine.AI;
-using UnityEngine.SocialPlatforms.Impl;
-
-public class NavM : MonoBehaviour
-{
-    //This is the code for the AI Navigation
-
-    
-    public GameObject playerLocation;  //Create a public reference so that the AI can follow the player's location
-    private NavMeshAgent navMeshAgent;   //Create a public reference so that the component, "navMeshAgent" can be used in the code
-    private int speeds = 4;  //Set the initial speed of the AI to 4
-    public PlayerController code; //Create a public reference so that the variable, "score" inside PlayerController's code can be used. The score is used to increase the AI's speed
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        navMeshAgent = GetComponent<NavMeshAgent>(); //Reference
-        
-        navMeshAgent.speed = speeds; //Set the initial speed of the AI to speeds (which is 4)
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        //This if statement checks if the player is still alive, and then sets the AI to chase the player by tracking their location constantly
-        if (playerLocation != null)
-        {
-            navMeshAgent.SetDestination(playerLocation.transform.position);
-            
-        }
-        //This constantly updates the speed according to the score. The AI's speed increases by 0.5 for everytime the player gathers a coin 
-        navMeshAgent.speed = (float)((code.score)/2+speeds);
-        
-
-        if (code.score == 8) //If the player gathers all 8 coins, destroy this object
-        {
-            Destroy(this.gameObject);
-        }
-        
-    }
-}
-*/
