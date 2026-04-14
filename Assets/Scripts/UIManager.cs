@@ -7,6 +7,8 @@ public class UIManager : MonoBehaviour
 
     private int currentStar;
 
+    public GameObject panel;
+
     public Image stars;
 
     public GameObjManager boss;
@@ -26,9 +28,9 @@ public class UIManager : MonoBehaviour
             addStars();
             currentStar++;
         }
-        
+        if (boss.getHit() == true)
         {
-            
+            panel.SetActive(true);
         }
     }
 

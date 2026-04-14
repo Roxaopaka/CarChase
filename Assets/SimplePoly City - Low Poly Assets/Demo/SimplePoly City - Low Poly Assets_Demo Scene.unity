@@ -198,6 +198,81 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0892d2ec61c444c1d9034b958b74476e, type: 3}
+--- !u!1 &335193675
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 335193676}
+  - component: {fileID: 335193678}
+  - component: {fileID: 335193677}
+  m_Layer: 5
+  m_Name: Panel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &335193676
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 335193675}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1039847745}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &335193677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 335193675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 0, b: 0, a: 0.392}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &335193678
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 335193675}
+  m_CullTransparentMesh: 1
 --- !u!1 &914678437
 GameObject:
   m_ObjectHideFlags: 0
@@ -525,7 +600,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 335193676}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -545,8 +621,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e1b56f06b09e4879ac4b27ba6e827ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  copSpawner: {fileID: 1488311241}
   stars: {fileID: 3410638938272314699, guid: e6504f887b4d04fb68f7dbc0efdef390, type: 3}
+  boss: {fileID: 0}
 --- !u!1 &1050093727
 GameObject:
   m_ObjectHideFlags: 0
@@ -885,6 +961,58 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1473698922
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1473698924}
+  - component: {fileID: 1473698923}
+  m_Layer: 0
+  m_Name: GameObjectManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1473698923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1473698922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03571e861c702490490986adc953985b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  UserVehicle: {fileID: 1869488939}
+  Camera: {fileID: 1704015169}
+  CopCar: {fileID: 7734176275252692964, guid: 3592ac52607e048009d69e4910e14954, type: 3}
+  CopCarSpawner: {fileID: 1488311241}
+  UserVehicleScript: {fileID: 0}
+  CameraScript: {fileID: 0}
+  CopCarScript: {fileID: 0}
+  CopCarSpawnerScript: {fileID: 0}
+--- !u!4 &1473698924
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1473698922}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 514.9187, y: 0.00001, z: 305.74063}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1479613758
 GameObject:
   m_ObjectHideFlags: 0
@@ -1027,7 +1155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   copPreFab: {fileID: 7734176275252692964, guid: 3592ac52607e048009d69e4910e14954, type: 3}
-  userCar: {fileID: 1869488939}
+  boss: {fileID: 1473698922}
 --- !u!4 &1488311243
 Transform:
   m_ObjectHideFlags: 0
@@ -1193,6 +1321,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   userCar: {fileID: 1869488939}
+  boss: {fileID: 1473698923}
 --- !u!1001 &1869488937
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1314,6 +1443,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   wantedLevel: 0
+  boss: {fileID: 1473698922}
 --- !u!54 &1869488942
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1796,16 +1926,17 @@ PrefabInstance:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1704015174}
   - {fileID: 1416758924}
   - {fileID: 981591807}
-  - {fileID: 1869488937}
   - {fileID: 1479613762}
   - {fileID: 1335791964219658638}
   - {fileID: 7212124211347923692}
   - {fileID: 916179174}
-  - {fileID: 1488311243}
   - {fileID: 1420670178}
   - {fileID: 1495934527}
   - {fileID: 1039847745}
   - {fileID: 1974909296}
+  - {fileID: 1473698924}
+  - {fileID: 1869488937}
+  - {fileID: 1488311243}
+  - {fileID: 1704015174}
