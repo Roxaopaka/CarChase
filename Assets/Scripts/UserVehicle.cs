@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -22,6 +23,7 @@ public class UserVehicle : MonoBehaviour
      private float rotateSpeed;
 
      private int iteration;
+     private float health;
     public GameObjManager boss;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -34,6 +36,7 @@ public class UserVehicle : MonoBehaviour
         minSpeed = -20;
         frictionConstant = 5;
         rb.mass = 1;
+        health = 100f;
 
 
         //*THE FOLLOWING 3 LINES WERE ASSISTED BY AI (CLAUDE)
@@ -118,6 +121,11 @@ public class UserVehicle : MonoBehaviour
             }
         }
 
+        if (boss.getHit() == true)
+        {
+            Destroy(gameObject);
+        }
+
     }
 
     void FixedUpdate(){
@@ -166,6 +174,16 @@ public class UserVehicle : MonoBehaviour
         {
             speed = speed*-0.2f;
         }
+        if (collision.gameObject.CompareTag("COP"))
+        {
+            CarDriveMechs script = collision.gameObject.GetComponent<CarDriveMechs>();
+            health = health-Math.Abs(speed-script.getSpeedInitial())*0.9f;
+            Debug.Log(health + "HEALTH");
+            if (health < 0)
+            {
+                Destroy(gameObject);
+            }
+        }
     }
 
     public int getIterationInitial()
@@ -186,6 +204,11 @@ public class UserVehicle : MonoBehaviour
     public Vector3 getUserLoccationInitial()
     {
         return transform.position;
+    }
+
+    public float getHealthInitial()
+    {
+        return health;
     }
 
 

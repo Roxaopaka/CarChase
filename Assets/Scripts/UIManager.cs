@@ -8,6 +8,7 @@ public class UIManager : MonoBehaviour
     private int currentStar;
 
     public GameObject panel;
+    public GameObject wastedImage;
 
     public Image stars;
 
@@ -28,9 +29,10 @@ public class UIManager : MonoBehaviour
             addStars();
             currentStar++;
         }
-        if (boss.getHit() == true)
+        if (boss.getHit() == true || boss.getHealth()<0)
         {
             panel.SetActive(true);
+            wastedImage.SetActive(true);
         }
     }
 

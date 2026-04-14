@@ -19,13 +19,14 @@ public class Spawner : MonoBehaviour //This is the script for the spawner of cop
     //Fixed update does not run every frame. Instead, it runs every 0.02 seconds
     void FixedUpdate()
     {
-        Debug.Log(boss.getWantedLevel());
-        
+
         //This if statement is to check if the user's wanted level went up
         if (currentWantedLevel - boss.getWantedLevel() <0)
         {
             //Instantiate the prefab
-            Instantiate(copPreFab,this.transform);
+            GameObject copSpawn = Instantiate(copPreFab,this.transform);
+            CarDriveMechs script = copSpawn.GetComponent<CarDriveMechs>();
+            script.boss = boss;
             numCars++;
         }
         currentWantedLevel = boss.getWantedLevel();

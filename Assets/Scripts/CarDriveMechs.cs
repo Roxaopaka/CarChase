@@ -9,6 +9,7 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
     private bool hit = false; //If the cop car catches the user, this becomes true
     private float maxSpeed = 50;
     public GameObjManager boss;
+    public float speed;
     
     void Start()
     {
@@ -36,6 +37,7 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
                 navMeshAgent.ResetPath();
     }   
         
+        speed = navMeshAgent.velocity.magnitude;
         
     }
 
@@ -97,6 +99,11 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
     public bool getHitInitial()
     {
         return hit;
+    }
+
+    public float getSpeedInitial()
+    {
+        return speed;
     }
     
         

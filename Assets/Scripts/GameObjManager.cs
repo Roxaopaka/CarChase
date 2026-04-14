@@ -48,6 +48,10 @@ public class GameObjManager : MonoBehaviour
     {
         return UserVehicleScript.getUserLoccationInitial();
     }
+    public float getHealth()
+    {
+        return UserVehicleScript.getHealthInitial();
+    }
 
 //Camera Movement Getters
     public int getCameraMode()
@@ -64,6 +68,10 @@ public class GameObjManager : MonoBehaviour
     public bool getHit()
     {
         return CopCarScript.getHitInitial();
+    }
+    public float getSpeedCop()
+    {
+        return CopCarScript.getSpeedInitial();
     }
 
 //Spawner Script Getters
