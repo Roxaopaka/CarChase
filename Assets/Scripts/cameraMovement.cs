@@ -7,13 +7,13 @@ public class cameraMovement : MonoBehaviour //This is the script for the camera
     private Camera cam;
 
     private int cameraMode;  //This is the variable to find out which camera orientation to have
-    private UserVehicle script; //<-- We have to get the user car's script to know if the user is attempting to change the camera orientation
 
     private Vector3 mode1 = new Vector3(60,38,53.91f); //<-- This is the STARTING position for camera option 1 (Up and sideways tilted down)
     private Vector3 mode2 = new Vector3(35,3,54.91f); //<-- This is the STARTINg position for camera option 2 (First person)
 
     private Vector3 cameraOffsetModel1; //<-- We need this to store the DIFFERENCE in user - car position so that we can apply this offset to any other position
     private Vector3 cameraOffsetMode2; //<-- We need this to store the DIFFERENCE in user - car position so that we can apply this offset to any other position
+    public GameObjManager boss;
 
 
 
@@ -21,7 +21,6 @@ public class cameraMovement : MonoBehaviour //This is the script for the camera
     void Start()
     {
         cam = GetComponent<Camera>();
-        script = userCar.GetComponent<UserVehicle>();
 
         cameraOffsetModel1 = mode1 - userCar.transform.position; //<-- This is the offset (difference in position) for camera mode 1
         cameraOffsetMode2 = mode2 - userCar.transform.position; //<-- This is the offset for camera mode 2
@@ -32,7 +31,7 @@ public class cameraMovement : MonoBehaviour //This is the script for the camera
     void Update()
     {
 
-        cameraMode = script.getIteration(); //Get iteration returns 0 or 1. If it is 0, camera mode 1 is enabled. If it is 1, camera mode 2 is enabled.
+        cameraMode = boss.getIteration(); //Get iteration returns 0 or 1. If it is 0, camera mode 1 is enabled. If it is 1, camera mode 2 is enabled.
 
         if (cameraMode == 0)
         {
@@ -51,5 +50,10 @@ public class cameraMovement : MonoBehaviour //This is the script for the camera
 
     }
     //POSTCONDITION: Camera follows the user's car in either mode 1 or mode 2
+
+    public int getCameraModeInitial()
+    {
+        return cameraMode;
+    }
 
 }

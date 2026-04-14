@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System;
 
 public class UserVehicle : MonoBehaviour
 {
@@ -23,8 +22,8 @@ public class UserVehicle : MonoBehaviour
      private float rotateSpeed;
 
      private int iteration;
+    public GameObjManager boss;
 
-     private float currentXRotation;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -135,11 +134,16 @@ public class UserVehicle : MonoBehaviour
     }
     
 
-
-    public int getIteration()
+    void OnMove(InputValue inputV)
     {
-        return iteration;
+        move2d = inputV.Get<Vector2>();
+
+        
+            movementX = move2d.x;
+            movementY = move2d.y;
+        
     }
+
 
     public void OnTestKey()
     {
@@ -153,13 +157,9 @@ public class UserVehicle : MonoBehaviour
         }
     }
 
-    public int getWantedLevel()
-    {
-        return wantedLevel;
-    }
+
 
     //If the user hits a building, get pushed back by reversing the speed
-
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("PushBack"))
@@ -167,6 +167,29 @@ public class UserVehicle : MonoBehaviour
             speed = speed*-0.2f;
         }
     }
+
+    public int getIterationInitial()
+    {
+        return iteration;
+    }
+
+    public int getWantedLevelInitial()
+    {
+        return wantedLevel;
+    }
+
+    public float getSpeedInitial()
+    {
+        return speed;
+    }
+
+    public Vector3 getUserLoccationInitial()
+    {
+        return transform.position;
+    }
+
+
+
     
 
 

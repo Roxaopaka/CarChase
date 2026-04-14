@@ -4,18 +4,15 @@ using UnityEngine.AI;
 public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop Car Pre Fab
 {
     private Rigidbody rb;
-
-    public GameObject playerLocation;  //Create a public reference so that the AI can follow the player's location
     private NavMeshAgent navMeshAgent;   //Create a public reference so that the component, "navMeshAgent" can be used in the code
     private float hitTimer = 0; //This timer is to check if the cop car is in contact with the user's car for 4 seconds. If hitTimer = 4, game over
     private bool hit = false; //If the cop car catches the user, this becomes true
-    private float maxSpeed = 40;
+    private float maxSpeed = 50;
+    public GameObjManager boss;
+    
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>(); 
-
-        //GET THE USER's LOCATION
-        playerLocation = GameObject.FindWithTag("CAR");
         
         rb = GetComponent<Rigidbody>();
         // Prevent Rigidbody from fighting the NavMeshAgent
@@ -29,11 +26,11 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
             gameObject.transform.position = new Vector3(gameObject.transform.position.x, 0.5f, gameObject.transform.position.z);
 
         //The angular speed decreases as linear speed increases, which simulates real world physics
-            navMeshAgent.angularSpeed = 200-navMeshAgent.velocity.magnitude;
+            navMeshAgent.angularSpeed = 400-navMeshAgent.velocity.magnitude;
             //If the user is still not caught
             if (hit != true)
             {   //Set the destination of the navMeshAgent to the user's location
-                navMeshAgent.SetDestination(playerLocation.transform.position);
+                navMeshAgent.SetDestination(boss.getUserLocation());
                 
             }else{
                 navMeshAgent.ResetPath();
@@ -89,6 +86,17 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
         {
             navMeshAgent.speed = maxSpeed;
         }
+    }
+
+
+    public float getHitTimerInitial()
+    {
+        return hitTimer;
+    }
+
+    public bool getHitInitial()
+    {
+        return hit;
     }
     
         

@@ -5,30 +5,30 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
 
-    public GameObject copSpawner;
-
-    private Spawner script;
-
     private int currentStar;
 
     public Image stars;
 
-    private Vector3 location;
-    private Quaternion rotation;
+    public GameObjManager boss;
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        script = copSpawner.GetComponent<Spawner>();
         currentStar = 0;
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (script.getNumCars()-currentStar == 1)
+        if (boss.getNumCars()-currentStar == 1)
         {
             addStars();
             currentStar++;
+        }
+        
+        {
+            
         }
     }
 
