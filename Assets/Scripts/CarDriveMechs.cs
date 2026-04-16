@@ -6,7 +6,6 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
     private Rigidbody rb;
     private NavMeshAgent navMeshAgent;   //Create a public reference so that the component, "navMeshAgent" can be used in the code
     private float hitTimer = 0; //This timer is to check if the cop car is in contact with the user's car for 4 seconds. If hitTimer = 4, game over
-    private bool hit = false; //If the cop car catches the user, this becomes true
     private float maxSpeed = 50;
     public GameObjManager boss;
     public float speed;
@@ -29,7 +28,7 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
         //The angular speed decreases as linear speed increases, which simulates real world physics
             navMeshAgent.angularSpeed = 400-navMeshAgent.velocity.magnitude;
             //If the user is still not caught
-            if (hit != true)
+            if (boss.getCaught() != true)
             {   //Set the destination of the navMeshAgent to the user's location
                 navMeshAgent.SetDestination(boss.getUserLocation());
                 
@@ -70,7 +69,7 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
             if (hitTimer >= 4)
             {
                 //The cop car has arrested the user car 
-                hit = true;
+                Destroy(collision.gameObject);
             }
         }
     }
@@ -94,11 +93,6 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
     public float getHitTimerInitial()
     {
         return hitTimer;
-    }
-
-    public bool getHitInitial()
-    {
-        return hit;
     }
 
     public float getSpeedInitial()

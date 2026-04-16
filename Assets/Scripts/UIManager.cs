@@ -29,7 +29,7 @@ public class UIManager : MonoBehaviour
             addStars();
             currentStar++;
         }
-        if (boss.getHit() == true || boss.getHealth()<0)
+        if (boss.getCaught() == true)
         {
             panel.SetActive(true);
             wastedImage.SetActive(true);

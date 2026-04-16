@@ -121,7 +121,7 @@ public class UserVehicle : MonoBehaviour
             }
         }
 
-        if (boss.getHit() == true)
+        if (boss.getCaught() == true)
         {
             Destroy(gameObject);
         }
@@ -182,6 +182,7 @@ public class UserVehicle : MonoBehaviour
             if (health < 0)
             {
                 Destroy(gameObject);
+                
             }
         }
     }

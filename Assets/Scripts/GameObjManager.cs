@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameObjManager : MonoBehaviour
@@ -12,6 +13,7 @@ public class GameObjManager : MonoBehaviour
     public cameraMovement CameraScript;
     public CarDriveMechs CopCarScript;
     public Spawner CopCarSpawnerScript;
+    public bool caught=false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -24,7 +26,11 @@ public class GameObjManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (UserVehicle == null)
+        {
+            caught = true;
+        }
+
     }
 
 
@@ -65,10 +71,6 @@ public class GameObjManager : MonoBehaviour
         return CopCarScript.getHitTimerInitial();
     }
 
-    public bool getHit()
-    {
-        return CopCarScript.getHitInitial();
-    }
     public float getSpeedCop()
     {
         return CopCarScript.getSpeedInitial();
@@ -79,6 +81,13 @@ public class GameObjManager : MonoBehaviour
     {
         return CopCarSpawnerScript.getNumCarsInitial();
     }
+
+//BOSS GETTERS
+    public bool getCaught()
+    {
+        return caught;
+    }
+
 
     
     

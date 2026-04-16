@@ -14,6 +14,10 @@ public class cameraMovement : MonoBehaviour //This is the script for the camera
     private Vector3 cameraOffsetModel1; //<-- We need this to store the DIFFERENCE in user - car position so that we can apply this offset to any other position
     private Vector3 cameraOffsetMode2; //<-- We need this to store the DIFFERENCE in user - car position so that we can apply this offset to any other position
     public GameObjManager boss;
+    public AudioSource sound;
+    public AudioClip boom;
+
+    private bool hasBoomed;
 
 
 
@@ -25,6 +29,7 @@ public class cameraMovement : MonoBehaviour //This is the script for the camera
         cameraOffsetModel1 = mode1 - userCar.transform.position; //<-- This is the offset (difference in position) for camera mode 1
         cameraOffsetMode2 = mode2 - userCar.transform.position; //<-- This is the offset for camera mode 2
         transform.position = mode1; //<-- The camera will first start in mode 1
+        sound = gameObject.GetComponent<AudioSource>();
 
     }
     //PRECONDITION: Camera object exists in the scene 
@@ -32,7 +37,7 @@ public class cameraMovement : MonoBehaviour //This is the script for the camera
     {
 
         cameraMode = boss.getIteration(); //Get iteration returns 0 or 1. If it is 0, camera mode 1 is enabled. If it is 1, camera mode 2 is enabled.
-
+    if(boss.getCaught()!=true){
         if (cameraMode == 0)
         {
             transform.position = userCar.transform.position+cameraOffsetModel1; //Apply the offset to any position every frame
@@ -45,6 +50,15 @@ public class cameraMovement : MonoBehaviour //This is the script for the camera
             transform.position = userCar.transform.position + userCar.transform.TransformDirection(cameraOffsetMode2); //Apply the offset. We use TransformDirection because we want WORLD COORDINATES, as the camera's rotation will change here.
             transform.rotation = userCar.transform.rotation; //<-- The rotation is the same as the user car's rotation
             cam.fieldOfView = 50f; //Field of view is 50
+        }
+
+    }
+
+        if (boss.getCaught() == true && hasBoomed!=true)
+        {
+            Debug.Log("PLAYING");
+            hasBoomed=true;
+            sound.PlayOneShot(boom);
         }
         
 
