@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -14,6 +15,10 @@ public class GameObjManager : MonoBehaviour
     public CarDriveMechs CopCarScript;
     public Spawner CopCarSpawnerScript;
     public bool caught=false;
+
+    private bool isUserFound;
+
+    private int numCarsSee;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -21,6 +26,7 @@ public class GameObjManager : MonoBehaviour
         CameraScript = Camera.GetComponent<cameraMovement>();
         CopCarScript = CopCar.GetComponent<CarDriveMechs>();
         CopCarSpawnerScript = CopCarSpawner.GetComponent<Spawner>();
+        numCarsSee = 0;
     }
 
     // Update is called once per frame
@@ -30,6 +36,27 @@ public class GameObjManager : MonoBehaviour
         {
             caught = true;
         }
+        List<GameObject> allCops = getAllCops();
+
+        for(int i = 0; i < allCops.Count; i++)
+        {
+            if (allCops[i].GetComponent<CarDriveMechs>().getUserFoundInitial()==true)
+            {
+                numCarsSee++;
+            }
+        }
+
+        if (numCarsSee >= 1)
+        {
+            isUserFound = true;
+        }
+        else
+        {
+            isUserFound = false;
+        }
+        numCarsSee = 0;
+        Debug.Log(numCarsSee + "numCarsSee");
+    
 
     }
 
@@ -59,6 +86,11 @@ public class GameObjManager : MonoBehaviour
         return UserVehicleScript.getHealthInitial();
     }
 
+    public Collider getMeshCollider()
+    {
+        return UserVehicle.GetComponent<MeshCollider>();
+    }
+
 //Camera Movement Getters
     public int getCameraMode()
     {
@@ -76,10 +108,25 @@ public class GameObjManager : MonoBehaviour
         return CopCarScript.getSpeedInitial();
     }
 
+    public Vector3 getLastKnownLocation()
+    {
+        return CopCarScript.getLastKnownLocationInitial();
+    }
+
+    public bool getUserFound()
+    {
+        return isUserFound;
+    }
+
 //Spawner Script Getters
     public int getNumCars()
     {
         return CopCarSpawnerScript.getNumCarsInitial();
+    }
+
+    public List<GameObject> getAllCops()
+    {
+        return CopCarSpawnerScript.getInitialAllCops();
     }
 
 //BOSS GETTERS

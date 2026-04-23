@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Spawner : MonoBehaviour //This is the script for the spawner of cop car objects
 {
@@ -9,6 +10,8 @@ public class Spawner : MonoBehaviour //This is the script for the spawner of cop
 
     private int numCars; //Store the number of police cars
     public GameObjManager boss;
+
+    public List<GameObject> allCops;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -28,6 +31,7 @@ public class Spawner : MonoBehaviour //This is the script for the spawner of cop
             CarDriveMechs script = copSpawn.GetComponent<CarDriveMechs>();
             script.boss = boss;
             numCars++;
+            allCops.Add(copSpawn);
         }
         currentWantedLevel = boss.getWantedLevel();
 }
@@ -35,6 +39,11 @@ public class Spawner : MonoBehaviour //This is the script for the spawner of cop
     public int getNumCarsInitial()
     {
         return numCars;
+    }
+
+    public List<GameObject> getInitialAllCops()
+    {
+        return allCops;
     }
 
 }

@@ -116,7 +116,6 @@ public class UserVehicle : MonoBehaviour
             if (count > 10)
             {
                 wantedLevel++;
-                Debug.Log(wantedLevel);
                 count-=10;
             }
         }
@@ -178,7 +177,6 @@ public class UserVehicle : MonoBehaviour
         {
             CarDriveMechs script = collision.gameObject.GetComponent<CarDriveMechs>();
             health = health-Math.Abs(speed-script.getSpeedInitial())*0.9f;
-            Debug.Log(health + "HEALTH");
             if (health < 0)
             {
                 Destroy(gameObject);

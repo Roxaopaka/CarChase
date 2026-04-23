@@ -1,14 +1,24 @@
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop Car Pre Fab
 {
     private Rigidbody rb;
     private NavMeshAgent navMeshAgent;   //Create a public reference so that the component, "navMeshAgent" can be used in the code
+    private Vector3[] targetPoints;
     private float hitTimer = 0; //This timer is to check if the cop car is in contact with the user's car for 4 seconds. If hitTimer = 4, game over
     private float maxSpeed = 50;
     public GameObjManager boss;
     public float speed;
+
+    public bool userFound;
+    public Vector3 lastKnownLocation;
+
+    private float fieldOfViewAngle = 360;
+
+    public LayerMask userLayer;
+    public LayerMask wallLayer;
+
+    private int maxViewDistance = 100;
     
     void Start()
     {
@@ -17,18 +27,31 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
         rb = GetComponent<Rigidbody>();
         // Prevent Rigidbody from fighting the NavMeshAgent
         rb.isKinematic = true;
+        Collider meshCollider = boss.getMeshCollider();
+        Bounds b = meshCollider.bounds;
+
+        // Points on the cop car used for line-of-sight raycasts.
+        targetPoints = new Vector3[]
+        {
+            b.center,
+            new Vector3(b.center.x, b.center.y, b.max.z),
+            new Vector3(b.center.x, b.center.y, b.min.z),
+            new Vector3(b.min.x, b.center.y, b.center.z),
+            new Vector3(b.max.x, b.center.y, b.center.z),
+        };
     }
 
     // Update is called once per frame
     void Update()
     {
+        canIseePlayer();
         //Keep the car at a constant height (0.5f)
             gameObject.transform.position = new Vector3(gameObject.transform.position.x, 0.5f, gameObject.transform.position.z);
 
         //The angular speed decreases as linear speed increases, which simulates real world physics
             navMeshAgent.angularSpeed = 400-navMeshAgent.velocity.magnitude;
             //If the user is still not caught
-            if (boss.getCaught() != true)
+            if (boss.getCaught() != true && boss.getUserFound()==true)
             {   //Set the destination of the navMeshAgent to the user's location
                 navMeshAgent.SetDestination(boss.getUserLocation());
                 
@@ -98,6 +121,58 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
     public float getSpeedInitial()
     {
         return speed;
+    }
+
+    public bool getUserFoundInitial()
+    {
+        return userFound;
+    }
+
+    public Vector3 getLastKnownLocationInitial()
+    {
+        return lastKnownLocation;
+    }
+
+    private void canIseePlayer()
+    {
+        if (Vector3.Distance(boss.getUserLocation(), this.transform.position) < maxViewDistance)
+        {   
+            Vector3 toUserVector = boss.getUserLocation() - transform.position;
+            float angle = Vector3.Angle(transform.forward, toUserVector);
+            if (angle < fieldOfViewAngle/2f)
+            {
+                
+                if(raysAttack()){
+                   userFound = true;
+            }
+            else
+            {
+                userFound = false;
+            }
+            
+
+        }
+        else
+        {
+            userFound = false;
+        }
+    }
+
+    }
+
+
+    private bool raysAttack()
+    {
+        for(int i = 0; i < targetPoints.Length;i++){
+            if(Physics.Raycast(this.transform.position,targetPoints[i],out RaycastHit hit,maxViewDistance)){
+                Debug.DrawRay(transform.position, targetPoints[i], Color.red);
+                if(hit.collider.CompareTag("CAR")){
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
     
         
