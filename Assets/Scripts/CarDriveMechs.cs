@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop Car Pre Fab
@@ -13,10 +14,14 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
     public bool userFound;
     public Vector3 lastKnownLocation;
 
-    private float fieldOfViewAngle = 360;
+    private float fieldOfViewAngle = 180;
 
     public LayerMask userLayer;
     public LayerMask wallLayer;
+
+    public String state;
+
+    private bool currentlySearchingLocation = false;
 
     private int maxViewDistance = 100;
     
@@ -44,6 +49,17 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
     // Update is called once per frame
     void Update()
     {
+        Collider meshCollider = boss.getMeshCollider();
+        Bounds b = meshCollider.bounds;
+        targetPoints = new Vector3[]
+        {
+            b.center,
+            new Vector3(b.center.x, b.center.y, b.max.z),
+            new Vector3(b.center.x, b.center.y, b.min.z),
+            new Vector3(b.min.x, b.center.y, b.center.z),
+            new Vector3(b.max.x, b.center.y, b.center.z),
+        };
+
         canIseePlayer();
         //Keep the car at a constant height (0.5f)
             gameObject.transform.position = new Vector3(gameObject.transform.position.x, 0.5f, gameObject.transform.position.z);
@@ -56,8 +72,11 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
                 navMeshAgent.SetDestination(boss.getUserLocation());
                 
             }else{
-                navMeshAgent.ResetPath();
-    }   
+            if (state.Equals("LookLastKnown") && currentlySearchingLocation==false)
+            {
+                searchLastKnown();
+            }
+    }
         
         speed = navMeshAgent.velocity.magnitude;
         
@@ -135,8 +154,9 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
 
     private void canIseePlayer()
     {
-        if (Vector3.Distance(boss.getUserLocation(), this.transform.position) < maxViewDistance)
+        if (Vector3.Distance(boss.getUserLocation(), transform.position) < maxViewDistance)
         {   
+            
             Vector3 toUserVector = boss.getUserLocation() - transform.position;
             float angle = Vector3.Angle(transform.forward, toUserVector);
             if (angle < fieldOfViewAngle/2f)
@@ -156,7 +176,10 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
         {
             userFound = false;
         }
-    }
+    }else
+        {
+            userFound = false;
+        }
 
     }
 
@@ -164,8 +187,7 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
     private bool raysAttack()
     {
         for(int i = 0; i < targetPoints.Length;i++){
-            if(Physics.Raycast(this.transform.position,targetPoints[i],out RaycastHit hit,maxViewDistance)){
-                Debug.DrawRay(transform.position, targetPoints[i], Color.red);
+            if(Physics.Raycast(transform.position,targetPoints[i]-transform.position,out RaycastHit hit,maxViewDistance)){
                 if(hit.collider.CompareTag("CAR")){
                     return true;
                 }
@@ -174,8 +196,19 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
 
         return false;
     }
-    
-        
-    
 
+    private void searchLastKnown()
+    {
+        navMeshAgent.SetDestination(boss.getLastKnownLocation());
+        currentlySearchingLocation = true;
+    }
+
+
+    public void setState(String s)
+    {
+        state = s;
+    }
+
+
+    
 }

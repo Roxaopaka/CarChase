@@ -54,8 +54,9 @@ public class GameObjManager : MonoBehaviour
         {
             isUserFound = false;
         }
+    
         numCarsSee = 0;
-        Debug.Log(numCarsSee + "numCarsSee");
+        
     
 
     }

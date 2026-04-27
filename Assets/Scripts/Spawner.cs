@@ -11,6 +11,8 @@ public class Spawner : MonoBehaviour //This is the script for the spawner of cop
     private int numCars; //Store the number of police cars
     public GameObjManager boss;
 
+    public GameObject closestCop = new GameObject();
+
     public List<GameObject> allCops;
 
 
@@ -34,6 +36,12 @@ public class Spawner : MonoBehaviour //This is the script for the spawner of cop
             allCops.Add(copSpawn);
         }
         currentWantedLevel = boss.getWantedLevel();
+
+
+        if (boss.getUserFound() == false)
+        {
+            searchLastKnownLocation();
+        }
 }
     //Getter method to return the number of police cars on the map
     public int getNumCarsInitial()
@@ -44,6 +52,28 @@ public class Spawner : MonoBehaviour //This is the script for the spawner of cop
     public List<GameObject> getInitialAllCops()
     {
         return allCops;
+    }
+
+    public void searchLastKnownLocation()
+    {
+        float currentDistance;
+        float min = 100000000f;
+        foreach(GameObject cops in allCops)
+        {
+            currentDistance = Vector3.Distance(boss.getUserLocation(), cops.transform.position);
+            if (currentDistance < min)
+            {
+                min = currentDistance;
+                closestCop = cops;
+            }
+        }
+
+        CarDriveMechs closestCopScript = closestCop.GetComponent<CarDriveMechs>();
+        if (closestCopScript != null)
+        {
+            closestCopScript.setState("LookLastKnown");
+        }
+       
     }
 
 }
