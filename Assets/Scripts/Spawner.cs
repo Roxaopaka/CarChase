@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class Spawner : MonoBehaviour //This is the script for the spawner of cop car objects
 {
@@ -11,14 +12,19 @@ public class Spawner : MonoBehaviour //This is the script for the spawner of cop
     private int numCars; //Store the number of police cars
     public GameObjManager boss;
 
-    public GameObject closestCop = new GameObject();
+    private GameObject closestCop = null;
 
     public List<GameObject> allCops;
+
+    public List<GameObject> roadObjects;
+
+    public bool alreadyLookingLastKnown = false;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        roadObjects = boss.findGameObjectsInLayer(7);
     }
 
     //Fixed update does not run every frame. Instead, it runs every 0.02 seconds
@@ -40,7 +46,14 @@ public class Spawner : MonoBehaviour //This is the script for the spawner of cop
 
         if (boss.getUserFound() == false)
         {
-            searchLastKnownLocation();
+            if (alreadyLookingLastKnown == false)
+            {
+                searchLastKnownLocation();
+            }
+            else
+            {
+                startPatrolling();
+            }
         }
 }
     //Getter method to return the number of police cars on the map
@@ -56,6 +69,12 @@ public class Spawner : MonoBehaviour //This is the script for the spawner of cop
 
     public void searchLastKnownLocation()
     {
+
+        if (allCops == null || allCops.Count == 0)
+        {
+            return;
+        } 
+        if(alreadyLookingLastKnown!=true){
         float currentDistance;
         float min = 100000000f;
         foreach(GameObject cops in allCops)
@@ -72,8 +91,58 @@ public class Spawner : MonoBehaviour //This is the script for the spawner of cop
         if (closestCopScript != null)
         {
             closestCopScript.setState("LookLastKnown");
+            alreadyLookingLastKnown = true;
         }
        
     }
+    }
+
+    public void startPatrolling()
+    {
+        List<Vector3> checkLocations = new List<Vector3>();
+        foreach(GameObject cop in allCops)
+        {
+            CarDriveMechs copScript = cop.GetComponent<CarDriveMechs>();
+            if (copScript.getState() == "")
+            {
+                bool found = false;
+                while (found == false)
+                {
+                    Vector3 location = generateRandomCoordinate(roadObjects);
+                    int equal = 0;
+                    for(int z = 0; z < checkLocations.Count; z++)
+                    {
+                        if (checkLocations[z] == location)
+                        {
+                            equal++;
+                        }
+                    }
+                    if (equal == 0)
+                    {
+                        found = true;
+                        checkLocations.Add(location);
+                    }
+                }
+                Debug.Log(checkLocations[checkLocations.Count-1]);
+                copScript.setState("Patrolling");
+                copScript.patrolling(checkLocations[checkLocations.Count-1]);
+                
+            }
+        }
+        
+    }
+
+    public Vector3 generateRandomCoordinate(List<GameObject> theseObjects)
+    {
+        
+        Vector3 location = new Vector3();
+        int random = UnityEngine.Random.Range(0,theseObjects.Count);
+        location = theseObjects[random].transform.position;
+            
+        
+        return location;
+    }
+
+    
 
 }

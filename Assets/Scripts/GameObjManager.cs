@@ -19,6 +19,8 @@ public class GameObjManager : MonoBehaviour
     private bool isUserFound;
 
     private int numCarsSee;
+
+    public GameObject[] findOnLayer;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -135,6 +137,24 @@ public class GameObjManager : MonoBehaviour
     {
         return caught;
     }
+
+    public List<GameObject> findGameObjectsInLayer(int layer) 
+    {
+        //Find All gameobjects
+        GameObject[] gameObjectList = FindObjectsOfType<GameObject>();
+        //Make a list of gameobjects
+        List<GameObject> gameObjectOnLayer = new List<GameObject>();
+        //Iterate through all gameobjects and find the one with the specific layer. If it matches, add them to the list
+        for (int i = 0; i < gameObjectList.Length; i++) {
+            if (gameObjectList[i].layer == layer) {
+                gameObjectOnLayer.Add(gameObjectList[i]);
+            }
+        }
+    return gameObjectOnLayer;
+    } 
+
+
+    
 
 
     

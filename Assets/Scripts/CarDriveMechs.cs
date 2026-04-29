@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop Car Pre Fab
@@ -19,19 +20,23 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
     public LayerMask userLayer;
     public LayerMask wallLayer;
 
-    public String state;
+    public String state = "";
 
     private bool currentlySearchingLocation = false;
 
     private int maxViewDistance = 100;
     
-    void Start()
+    void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>(); 
         
         rb = GetComponent<Rigidbody>();
         // Prevent Rigidbody from fighting the NavMeshAgent
         rb.isKinematic = true;
+        
+    }
+    void Start()
+    {
         Collider meshCollider = boss.getMeshCollider();
         Bounds b = meshCollider.bounds;
 
@@ -72,10 +77,20 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
                 navMeshAgent.SetDestination(boss.getUserLocation());
                 
             }else{
+
             if (state.Equals("LookLastKnown") && currentlySearchingLocation==false)
             {
                 searchLastKnown();
             }
+            if(state.Equals("LookLastKnown") && currentlySearchingLocation == true && Vector3.Distance(transform.position, boss.getLastKnownLocation()) < 1.5f)
+            {
+                currentlySearchingLocation = false;
+                state = "";
+            }
+
+    
+
+        
     }
         
         speed = navMeshAgent.velocity.magnitude;
@@ -203,10 +218,21 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
         currentlySearchingLocation = true;
     }
 
+    public void patrolling(Vector3 location)
+    {
+        navMeshAgent.SetDestination(location);
+    }
+
 
     public void setState(String s)
     {
         state = s;
+        Debug.Log(state);
+    }
+
+    public String getState()
+    {
+        return state;
     }
 
 
