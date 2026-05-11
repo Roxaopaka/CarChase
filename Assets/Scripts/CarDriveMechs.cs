@@ -77,6 +77,8 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
             {   //Set the destination of the navMeshAgent to the user's location
                 navMeshAgent.SetDestination(boss.getUserLocation());
                 state = "";
+                currentlySearchingLocation = false;
+
                 
             }else{
 
