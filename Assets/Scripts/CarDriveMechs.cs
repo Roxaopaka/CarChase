@@ -7,6 +7,7 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
     private Rigidbody rb;
     private NavMeshAgent navMeshAgent;   //Create a public reference so that the component, "navMeshAgent" can be used in the code
     private Vector3[] targetPoints;
+    private Vector3 patrolLocation;
     private float hitTimer = 0; //This timer is to check if the cop car is in contact with the user's car for 4 seconds. If hitTimer = 4, game over
     private float maxSpeed = 50;
     public GameObjManager boss;
@@ -15,7 +16,7 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
     public bool userFound;
     public Vector3 lastKnownLocation;
 
-    private float fieldOfViewAngle = 180;
+    private float fieldOfViewAngle = 270;
 
     public LayerMask userLayer;
     public LayerMask wallLayer;
@@ -75,6 +76,7 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
             if (boss.getCaught() != true && boss.getUserFound()==true)
             {   //Set the destination of the navMeshAgent to the user's location
                 navMeshAgent.SetDestination(boss.getUserLocation());
+                state = "";
                 
             }else{
 
@@ -85,6 +87,10 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
             if(state.Equals("LookLastKnown") && currentlySearchingLocation == true && Vector3.Distance(transform.position, boss.getLastKnownLocation()) < 1.5f)
             {
                 currentlySearchingLocation = false;
+                state = "";
+            }
+            if(state.Equals("Patrolling") && (Vector3.Distance(transform.position, patrolLocation) < 1.5f))
+            {
                 state = "";
             }
 
@@ -183,8 +189,7 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
             else
             {
                 userFound = false;
-            }
-            
+            }  
 
         }
         else
@@ -220,6 +225,7 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
 
     public void patrolling(Vector3 location)
     {
+        patrolLocation = location;
         navMeshAgent.SetDestination(location);
     }
 

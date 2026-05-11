@@ -55,6 +55,10 @@ public class Spawner : MonoBehaviour //This is the script for the spawner of cop
                 startPatrolling();
             }
         }
+        if (boss.getUserFound() == true)
+        {
+            alreadyLookingLastKnown = false;
+        }
 }
     //Getter method to return the number of police cars on the map
     public int getNumCarsInitial()
