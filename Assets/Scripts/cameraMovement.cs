@@ -56,7 +56,6 @@ public class cameraMovement : MonoBehaviour //This is the script for the camera
 
         if (boss.getCaught() == true && hasBoomed!=true)
         {
-            Debug.Log("PLAYING");
             hasBoomed=true;
             sound.PlayOneShot(boom);
         }

@@ -6,26 +6,42 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
 {
     private Rigidbody rb;
     private NavMeshAgent navMeshAgent;   //Create a public reference so that the component, "navMeshAgent" can be used in the code
+
+    //Target points is the the raycast's target location (ie. the user car's collider boundaries)
     private Vector3[] targetPoints;
+    //PatrolLocation stores the random location that the cop car must look, which is assigned by the Spawner
     private Vector3 patrolLocation;
     private float hitTimer = 0; //This timer is to check if the cop car is in contact with the user's car for 4 seconds. If hitTimer = 4, game over
     private float maxSpeed = 50;
     public GameObjManager boss;
     public float speed;
 
-    public bool userFound;
+    //Each cop car requires userFound so that the Boss can see how many cop cars see the user. If its more or equal to 1,
+    //all cop cars get the user location
+    public bool userFound; 
+    //This stores the lastKnownLocation that THIS SPECIFIC COP CAR saw the user
     public Vector3 lastKnownLocation;
 
+    //This fieldOfViewAngle is how wide. the cop car can see. The wider the FOV, the more area around the cop car that the cop can see
+    //This fieldOfViewAngle is the second barrier to start sending rays to the user (canIseePlayer())
     private float fieldOfViewAngle = 270;
 
-    public LayerMask userLayer;
+    //All walls exist on the wallLayer. The wallLayer is used so that raycast knows which object to recognize as an obstruction
+    //Only objects existing on the wallLayer are considered to be an obstruction for the raycast
     public LayerMask wallLayer;
-
+    
+    //The state is essentially the current task of a cop car. There are three potential states:
+    // 1: "" <-- This means that the cop car is either jobless (looking to be assigned Patrolling job) or it is chasing the user car
+    //For "", if it is jobless, there is only a split second before it is assigned a role, as Spawner is constantly checking for cops that are jobless (in update())
+    // 2: "LookLastKnown" <-- This means that the cop car is assigned to check the lastKnown user location
+    // 3: "Patrolling" <-- This means that the cop car is assigned the patrolling job
     public String state = "";
 
     private bool currentlySearchingLocation = false;
 
-    private int maxViewDistance = 100;
+    //MaxViewDistance is the maximum distance that the cop car can see
+    //This is the first barrier to start sending rays to the user (canIseePlayer())
+    private int maxViewDistance = 200;
     
     void Awake()
     {
@@ -38,41 +54,35 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
     }
     void Start()
     {
-        Collider meshCollider = boss.getMeshCollider();
-        Bounds b = meshCollider.bounds;
-
-        // Points on the cop car used for line-of-sight raycasts.
-        targetPoints = new Vector3[]
-        {
-            b.center,
-            new Vector3(b.center.x, b.center.y, b.max.z),
-            new Vector3(b.center.x, b.center.y, b.min.z),
-            new Vector3(b.min.x, b.center.y, b.center.z),
-            new Vector3(b.max.x, b.center.y, b.center.z),
-        };
+        //Updates the user's collider's boundaries so that raycast will be sent in the right direction
+        updateTargetPoints();
     }
 
     // Update is called once per frame
     void Update()
     {
-        Collider meshCollider = boss.getMeshCollider();
-        Bounds b = meshCollider.bounds;
-        targetPoints = new Vector3[]
+        //If the cop car is either patrolling or looking last known, don't speed. Go slow and steady. 
+        if(state.Equals("Patrolling") || state.Equals("LookLastKnown"))
         {
-            b.center,
-            new Vector3(b.center.x, b.center.y, b.max.z),
-            new Vector3(b.center.x, b.center.y, b.min.z),
-            new Vector3(b.min.x, b.center.y, b.center.z),
-            new Vector3(b.max.x, b.center.y, b.center.z),
-        };
+            navMeshAgent.speed = 20f;
+            navMeshAgent.acceleration = 5f;
+        }
+        //If the cop car is currently chasing the user, increase max speed and acceleration
+        else
+        {
+            navMeshAgent.speed = 45;
+            navMeshAgent.acceleration = 15f;
+        }
+        //Update the user's collider's boundaries
+        updateTargetPoints();
 
         canIseePlayer();
         //Keep the car at a constant height (0.5f)
             gameObject.transform.position = new Vector3(gameObject.transform.position.x, 0.5f, gameObject.transform.position.z);
 
         //The angular speed decreases as linear speed increases, which simulates real world physics
-            navMeshAgent.angularSpeed = 400-navMeshAgent.velocity.magnitude;
-            //If the user is still not caught
+            navMeshAgent.angularSpeed = 200-navMeshAgent.velocity.magnitude;
+            //If the user is still not caught and user is seen by a cop
             if (boss.getCaught() != true && boss.getUserFound()==true)
             {   //Set the destination of the navMeshAgent to the user's location
                 navMeshAgent.SetDestination(boss.getUserLocation());
@@ -81,16 +91,18 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
 
                 
             }else{
-
+            //If it is assigned "LookLastKnown" by spawner and it hasn't already started the job, call searchLastKnown()
             if (state.Equals("LookLastKnown") && currentlySearchingLocation==false)
             {
                 searchLastKnown();
             }
+            //If it is assigned "LookLastKnown" and it got to the last seen location, become jobless
             if(state.Equals("LookLastKnown") && currentlySearchingLocation == true && Vector3.Distance(transform.position, boss.getLastKnownLocation()) < 1.5f)
             {
                 currentlySearchingLocation = false;
                 state = "";
             }
+            //If it is patrolling and it got to the patrol location, become jobless
             if(state.Equals("Patrolling") && (Vector3.Distance(transform.position, patrolLocation) < 1.5f))
             {
                 state = "";
@@ -126,7 +138,7 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
     void OnCollisionStay(Collision collision)
     {
         //If the cop car hits the user car
-        if (collision.gameObject.CompareTag("CAR"))
+        if (isUserVehicle(collision.gameObject))
         {
             //Start counting up
             hitTimer+=1*Time.deltaTime;
@@ -134,7 +146,7 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
             if (hitTimer >= 4)
             {
                 //The cop car has arrested the user car 
-                Destroy(collision.gameObject);
+                Destroy(boss.UserVehicle);
             }
         }
     }
@@ -143,7 +155,7 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
     void OnCollisionExit(Collision collision)
     {
         //If the cop car stops hitting the user car, reset the timer
-        if (collision.gameObject.CompareTag("CAR"))
+        if (isUserVehicle(collision.gameObject))
         {
             hitTimer = 0f;
         }
@@ -175,18 +187,30 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
         return lastKnownLocation;
     }
 
+    //THIS IS THE INTERESTING PART
+    //canIseePlayer checks if the cop car has a clear line of sight of the user
+    //Two conditions must be met for a ray to be sent
+    //First, the delta distance is less than the max view distance
+    //Second, the user car is in the cop cars FOV
+    //These two conditions must be met for a ray to be sent. 
+    //By having two conditions, it reduces the chance for the ray to be sent unless it is CONFIDENT that it will hit the user
+    //Less rays sent = Less lag
     private void canIseePlayer()
     {
+        //Is the delta distance less than max distance?
         if (Vector3.Distance(boss.getUserLocation(), transform.position) < maxViewDistance)
         {   
             
             Vector3 toUserVector = boss.getUserLocation() - transform.position;
             float angle = Vector3.Angle(transform.forward, toUserVector);
+            //Is the car within FOV?
             if (angle < fieldOfViewAngle/2f)
             {
-                
+                //If both conditions pass, lets start shooting rays (check out raysAttack())
                 if(raysAttack()){
+                    //If raysAttack() is true, user is found
                    userFound = true;
+                   lastKnownLocation = boss.getUserLocation();
             }
             else
             {
@@ -206,17 +230,46 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
     }
 
 
+    //This function is the one that actually sends rays. 
     private bool raysAttack()
     {
+        //for every boundary in the user's collider,
         for(int i = 0; i < targetPoints.Length;i++){
-            if(Physics.Raycast(transform.position,targetPoints[i]-transform.position,out RaycastHit hit,maxViewDistance)){
-                if(hit.collider.CompareTag("CAR")){
-                    return true;
-                }
+            //shoot a ray towards it and objects on the wall layer are obstructions
+            if(!Physics.Linecast(transform.position, targetPoints[i], wallLayer)){
+                //If it hits, return true
+                return true;
             }
         }
 
         return false;
+    }
+
+    private bool isUserVehicle(GameObject hitObject)
+    {
+        if (boss != null && boss.UserVehicle != null)
+        {
+            Transform userVehicleTransform = boss.UserVehicle.transform;
+            return hitObject == boss.UserVehicle || hitObject.transform.IsChildOf(userVehicleTransform);
+        }
+
+        return hitObject.CompareTag("CAR") || hitObject.transform.root.CompareTag("CAR");
+    }
+
+    //Update the cop car's boundary
+    private void updateTargetPoints()
+    {
+        Bounds b = boss.getUserBounds();
+
+        // Points on the user's car used for line-of-sight checks.
+        targetPoints = new Vector3[]
+        {
+            b.center,
+            new Vector3(b.center.x, b.center.y, b.max.z),
+            new Vector3(b.center.x, b.center.y, b.min.z),
+            new Vector3(b.min.x, b.center.y, b.center.z),
+            new Vector3(b.max.x, b.center.y, b.center.z),
+        };
     }
 
     private void searchLastKnown()
@@ -235,7 +288,6 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
     public void setState(String s)
     {
         state = s;
-        Debug.Log(state);
     }
 
     public String getState()

@@ -4,27 +4,38 @@ using UnityEngine;
 
 public class GameObjManager : MonoBehaviour
 {
+    //THIS IS THE BIG BOSS
+    // Basically the big boss is a big storage of references for all gameobjects and each variable in a gameobject
+    //By making a single place have everything, it makes it so that other game objects don't have to reference like the 4+ other gameobjects and call it in its script
+    //Just by having a reference to the big boss, the gameobject gets access to everything
+    //It also stores universal functions that might be useful for multiple gameobjects, such as findGameObjectOnLayer()
+    public GameObject UserVehicle; //Reference for the user car
+    public GameObject Camera; //Ref to the camera
+    public GameObject CopCar; //Ref to the cop car
+    public GameObject CopCarSpawner; //Ref to the cop car spawner
 
-    public GameObject UserVehicle;
-    public GameObject Camera;
-    public GameObject CopCar;
-    public GameObject CopCarSpawner;
+    public PrometeoCarController UserVehicleScript; //Script for user car (PrometeoCarController)
+    public cameraMovement CameraScript; //Script for camera (cameraMovement)
+    public CarDriveMechs CopCarScript; //Script for cop car prefab (CarDriveMechs)
+    public Spawner CopCarSpawnerScript; //Script for copCar spawner (Spawner)
+    public bool caught=false; //Bool that stores if the user gets caught
+    //There are two ways for the user car to get caught
+    // 1: The cop car is in contact with the user car CONSECUTIVELY for 4 seconds
+    // 2: The cop car destroys the user car by ramming into it with a big enough speed difference between user car and cop car
 
-    public UserVehicle UserVehicleScript;
-    public cameraMovement CameraScript;
-    public CarDriveMechs CopCarScript;
-    public Spawner CopCarSpawnerScript;
-    public bool caught=false;
+    private bool isUserFound; //Bool that stores if the user is found
+    //If the user is found (seen), ALL cop car receives the location of the user
+    private Vector3 lastKnownLocation; //Vector 3 that stores the location of the user car's last seen location
+    //The closest cop car to the last seen location of the user will check that location
 
-    private bool isUserFound;
-
-    private int numCarsSee;
+    private int numCarsSee; //Integer that stores how many cop cars can see the user
 
     public GameObject[] findOnLayer;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        UserVehicleScript = UserVehicle.GetComponent<UserVehicle>();
+        //The following 5 lines just get the script values for each gameobject
+        UserVehicleScript = UserVehicle.GetComponent<PrometeoCarController>(); 
         CameraScript = Camera.GetComponent<cameraMovement>();
         CopCarScript = CopCar.GetComponent<CarDriveMechs>();
         CopCarSpawnerScript = CopCarSpawner.GetComponent<Spawner>();
@@ -34,17 +45,26 @@ public class GameObjManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //THIS IS THE IMPORTANT PART
+        //This if statement updates caught if the gameobject is destroyed
         if (UserVehicle == null)
         {
             caught = true;
         }
+        //GetAllCops returns an array of gameobjects that contain all child objects of copcar spawner
         List<GameObject> allCops = getAllCops();
 
+        //This for loop checks to see if even a single cop car sees the user. 
+        //If even one cop sees the user, isUserFound becomes true and then all cop gets access to the user location
+        //This for loop works by checking each cops status on whether it sees the user. If one user sees the cop,
+        //Lask Known location becomes updated and all cop gets access to the user location
         for(int i = 0; i < allCops.Count; i++)
         {
-            if (allCops[i].GetComponent<CarDriveMechs>().getUserFoundInitial()==true)
+            CarDriveMechs copScript = allCops[i].GetComponent<CarDriveMechs>();
+            if (copScript.getUserFoundInitial()==true)
             {
                 numCarsSee++;
+                lastKnownLocation = copScript.getLastKnownLocationInitial();
             }
         }
 
@@ -91,8 +111,37 @@ public class GameObjManager : MonoBehaviour
 
     public Collider getMeshCollider()
     {
-        return UserVehicle.GetComponent<MeshCollider>();
+        if (UserVehicle == null)
+        {
+            return null;
+        }
+
+        return UserVehicle.GetComponentInChildren<Collider>(); // Prometeo keeps some colliders on child objects.
     }
+
+    //This function was CODED WITH THE ASSISTANCE OF AI
+    //It essentially gets the user's collider's edges so that rays can be sent to the edge of the collider
+    //If even one ray hits a single bound (this is done in CarDriveMechs), the user becomes found
+    //This logic ensures that any part of the car counts as a hit. If the code only sent one ray to the center instead,
+    //the cop car wouldn't see the user car if there was just a very thin wall that obstructed the center point.
+    public Bounds getUserBounds()
+    {
+        Collider[] colliders = UserVehicle.GetComponentsInChildren<Collider>();
+        if (colliders.Length == 0)
+        {
+            return new Bounds(UserVehicle.transform.position, Vector3.one);
+        }
+
+        Bounds bounds = colliders[0].bounds;
+
+        for (int i = 1; i < colliders.Length; i++)
+        {
+            bounds.Encapsulate(colliders[i].bounds);
+        }
+
+        return bounds;
+    }
+    
 
 //Camera Movement Getters
     public int getCameraMode()
@@ -113,7 +162,7 @@ public class GameObjManager : MonoBehaviour
 
     public Vector3 getLastKnownLocation()
     {
-        return CopCarScript.getLastKnownLocationInitial();
+        return lastKnownLocation;
     }
 
     public bool getUserFound()
@@ -138,6 +187,9 @@ public class GameObjManager : MonoBehaviour
         return caught;
     }
 
+    //This function returns a list of gameobjects that exist on a certain layer (set in the object on Unity)
+    //The primary user of this function is the Spawner. 
+    //The spawner uses it so that the Spawner can generate a random coordinate on a specific LAYER
     public List<GameObject> findGameObjectsInLayer(int layer) 
     {
         //Find All gameobjects
