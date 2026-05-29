@@ -6,6 +6,8 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
 {
     private Rigidbody rb;
     private NavMeshAgent navMeshAgent;   //Create a public reference so that the component, "navMeshAgent" can be used in the code
+    public float chaseTurnSpeed = 720f;
+    public float patrolTurnSpeed = 540f;
 
     //Target points is the the raycast's target location (ie. the user car's collider boundaries)
     private Vector3[] targetPoints;
@@ -50,6 +52,8 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
         rb = GetComponent<Rigidbody>();
         // Prevent Rigidbody from fighting the NavMeshAgent
         rb.isKinematic = true;
+        navMeshAgent.autoBraking = false;
+        navMeshAgent.stoppingDistance = 0f;
         
     }
     void Start()
@@ -65,13 +69,15 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
         if(state.Equals("Patrolling") || state.Equals("LookLastKnown"))
         {
             navMeshAgent.speed = 20f;
-            navMeshAgent.acceleration = 5f;
+            navMeshAgent.acceleration = 10f;
+            navMeshAgent.angularSpeed = patrolTurnSpeed;
         }
         //If the cop car is currently chasing the user, increase max speed and acceleration
         else
         {
-            navMeshAgent.speed = 45;
-            navMeshAgent.acceleration = 15f;
+            navMeshAgent.speed = 42;
+            navMeshAgent.acceleration = 25f;
+            navMeshAgent.angularSpeed = chaseTurnSpeed;
         }
         //Update the user's collider's boundaries
         updateTargetPoints();
@@ -80,8 +86,6 @@ public class CarDriveMechs : MonoBehaviour //<-- This is the script for the Cop 
         //Keep the car at a constant height (0.5f)
             gameObject.transform.position = new Vector3(gameObject.transform.position.x, 0.5f, gameObject.transform.position.z);
 
-        //The angular speed decreases as linear speed increases, which simulates real world physics
-            navMeshAgent.angularSpeed = 200-navMeshAgent.velocity.magnitude;
             //If the user is still not caught and user is seen by a cop
             if (boss.getCaught() != true && boss.getUserFound()==true)
             {   //Set the destination of the navMeshAgent to the user's location

@@ -19,7 +19,7 @@ public class PrometeoCarController : MonoBehaviour
     public GameObjManager boss;
 
     public int wantedLevel;
-    public float startingHealth = 100f;
+    public float startingHealth=200f;
     public float minimumCrashSpeedForDamage = 8f;
     public float crashDamageMultiplier = 0.9f;
     private float count;
@@ -315,7 +315,7 @@ public class PrometeoCarController : MonoBehaviour
       ReadDrivingInput();
 
       //RION EDITED
-      if (carSpeed > 30 && wantedLevel==0)
+      if (carSpeed > 80 && wantedLevel==0)
         {
             wantedLevel=1;
         }

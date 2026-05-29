@@ -8,10 +8,15 @@ public class Spawner : MonoBehaviour //This is the script for the spawner of cop
 
     public GameObject copPreFab; //Reference for the cop car prefab
 
+    public bool droneSpawned = false;
+
+
     private int currentWantedLevel; //Store the current wanted level
 
     private int numCars; //Store the number of police cars
     public GameObjManager boss;
+
+    public GameObject drone;
 
     //The reference to the closestCop to the user's location
     //This is used to assign who checks the last known location 
@@ -51,6 +56,16 @@ public class Spawner : MonoBehaviour //This is the script for the spawner of cop
             allCops.Add(copSpawn);
         }
         currentWantedLevel = boss.getWantedLevel();
+        if (currentWantedLevel>1 && droneSpawned == false)
+        {
+            droneSpawned = true;
+            Vector3 spawnLocation = new Vector3(-677.4f,103,-38.00942f);
+
+            Debug.Log("SPAWNED");
+            GameObject droneSpawn = Instantiate(drone, this.transform);
+            DroneController droneScript = droneSpawn.GetComponent<DroneController>();
+            droneScript.boss = boss;
+        }
 
         //THIS IS THE INTERESTING PART
         //If the user isn't found, the spawner has to assign one cop to check the last known location,
@@ -89,6 +104,11 @@ public class Spawner : MonoBehaviour //This is the script for the spawner of cop
     public List<GameObject> getInitialAllCops()
     {
         return allCops;
+    }
+
+    public bool getDroneSpawnedInitial()
+    {
+        return droneSpawned;
     }
 
     //This function assigns the closest cop to the last known user location to check the last known user location
@@ -142,7 +162,7 @@ public class Spawner : MonoBehaviour //This is the script for the spawner of cop
                     //while found is false, generate a random coordinate from road objects
                     //the for loop checks if there is no duplicate
                     //if there is no duplicate, it adds the assigned coordinate to checkLocations[] and found becomes true
-                    Vector3 location = generateRandomCoordinate(roadObjects);
+                    Vector3 location = generateCoordinate(roadObjects);
                     int equal = 0;
                     for(int z = 0; z < checkLocations.Count; z++)
                     {
@@ -167,7 +187,7 @@ public class Spawner : MonoBehaviour //This is the script for the spawner of cop
         
     }
     //This function generates a random coordinate from a list of gameobjects
-    public Vector3 generateRandomCoordinate(List<GameObject> theseObjects)
+    public Vector3 generateCoordinate(List<GameObject> theseObjects)
     {
         
         Vector3 location = new Vector3();

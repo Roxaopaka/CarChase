@@ -45,6 +45,11 @@ public class GameObjManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        if (CopCarSpawnerScript.getDroneSpawnedInitial() == true)
+        {
+            isUserFound = true;
+        }
         //THIS IS THE IMPORTANT PART
         //This if statement updates caught if the gameobject is destroyed
         if (UserVehicle == null)
